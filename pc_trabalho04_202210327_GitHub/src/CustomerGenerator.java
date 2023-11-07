@@ -14,7 +14,7 @@ import java.util.Random;
 public class CustomerGenerator extends Thread {
   // Atributos da classe:
   public BarberShop barberShop; // Instancia da barbearia
-  public int id = 1; // Variavel de controle para o id de cada cliente
+  public int id; // Variavel de controle para o id de cada cliente
   /* ******************* */ // Fim Atributos
 
   // Construtores:
@@ -29,6 +29,7 @@ public class CustomerGenerator extends Thread {
    */
   public CustomerGenerator(BarberShop barberShop) {
     this.barberShop = barberShop;
+    this.id = 1;
   }
   /* ************ */ // Fim Construtores
 
@@ -43,6 +44,10 @@ public class CustomerGenerator extends Thread {
   @Override
   public void run() {
     while (true) { // loop infinito (gerando clientes ao longo do tempo de execucao)
+      if (Thread.currentThread().isInterrupted()) {
+        break;
+      } // fim if (Thread.currentThread().isInterrupted())
+      
       try {
         barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
 
