@@ -15,6 +15,8 @@ public class CustomerGenerator extends Thread {
   // Atributos da classe:
   public BarberShop barberShop; // Instancia da barbearia
   public int id; // Variavel de controle para o id de cada cliente
+  public int generationSpeed = 3; // Varivael de controle para a velocidade de geracao dos novos clientes
+  public boolean isGenerationPaused = false;
   /* ******************* */ // Fim Atributos
 
   // Construtores:
@@ -25,6 +27,7 @@ public class CustomerGenerator extends Thread {
    * Parametros: recebe uma instancia da barbearia
    * Retorno: nao retorna valor
    * ***************************************************************
+   * 
    * @param barberShop
    */
   public CustomerGenerator(BarberShop barberShop) {
@@ -40,34 +43,43 @@ public class CustomerGenerator extends Thread {
    * Funcao: metodo que inicia a execucao desta thread
    * Parametros: nao recebe parametros
    * Retorno: nao retorna valor
-   * **************************************************************/
+   **************************************************************/
   @Override
   public void run() {
     while (true) { // loop infinito (gerando clientes ao longo do tempo de execucao)
-      if (Thread.currentThread().isInterrupted()) {
-        break;
-      } // fim if (Thread.currentThread().isInterrupted())
-      
-      try {
-        barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
+      if (!isGenerationPaused) {
+        if (Thread.currentThread().isInterrupted()) {
+          break;
+        } // fim if (Thread.currentThread().isInterrupted())
 
-        this.id++; // Incrementa o id para instanciar um novo cliente
+        try {
+          barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
 
-        /* Abaixo temos a geracao de um numero aleatorio para definir um intervalo de tempo
-        * aleatorio entre uma geracao e outra dentro do loop (impedindo que a geracao ocorra 
-        * ao longo do tempo de execucao) */
-        Random rand = new Random(); 
-        int randomTime = rand.nextInt(1, 3);
+          this.id++; // Incrementa o id para instanciar um novo cliente
 
-        /* if (this.id == 20) {
-          Thread.currentThread().interrupt();
-        } */
+          /*
+           * Abaixo temos a geracao de um numero aleatorio para definir um intervalo de
+           * tempo
+           * aleatorio entre uma geracao e outra dentro do loop (impedindo que a geracao
+           * ocorra
+           * ao longo do tempo de execucao)
+           */
+          Random rand = new Random();
+          int randomTime = rand.nextInt(1, generationSpeed+1);
 
-        Thread.sleep(randomTime * 1000); // Por fim, eh setado o tempo de sleep da thread geradora (intervalo entre uma geracao e outra)
-      } catch (InterruptedException e) { // Caso ocorra uma interrupcao na thread:
-        Thread.currentThread().interrupt(); // Interrompe a thread
-        break; // Sai do loop
-      } // fim try-catch
+          /*
+           * if (this.id == 20) {
+           * Thread.currentThread().interrupt();
+           * }
+           */
+
+          Thread.sleep(randomTime * 1000); // Por fim, eh setado o tempo de sleep da thread geradora (intervalo entre
+                                           // uma geracao e outra)
+        } catch (InterruptedException e) { // Caso ocorra uma interrupcao na thread:
+          Thread.currentThread().interrupt(); // Interrompe a thread
+          break; // Sai do loop
+        } // fim try-catch
+      }
     } // fim while (true)
   } // fim run()
 
@@ -78,6 +90,7 @@ public class CustomerGenerator extends Thread {
    * Parametros: nao recebe parametros
    * Retorno: instancia da barbearia
    * *************************************************************
+   * 
    * @return barberShop
    */
   public BarberShop getBarberShop() {
@@ -91,6 +104,7 @@ public class CustomerGenerator extends Thread {
    * Parametros: recebe uma instancia da barbearia
    * Retorno: nao retorna valor
    * *************************************************************
+   * 
    * @param barberShop
    */
   public void setBarberShop(BarberShop barberShop) {
@@ -104,6 +118,7 @@ public class CustomerGenerator extends Thread {
    * Parametros: nao recebe parametros
    * Retorno: int representando o id do cliente
    * *************************************************************
+   * 
    * @return id
    */
   public int getCurrentCustomerId() {
@@ -117,11 +132,27 @@ public class CustomerGenerator extends Thread {
    * Parametros: recebe um int representando o id do cliente
    * Retorno: nao retorna valor
    * *************************************************************
+   * 
    * @param id
    */
   public void setCurrentCustomerId(int id) {
     this.id = id;
   } // fim setBarberShop()
 
+  public void setCustomersSpeed(int newSpeed) {
+    this.generationSpeed = newSpeed;
+    System.out.println("Clientes chegando a uma velocidade de até " + this.generationSpeed + " segundos");
+  } // fim setCustomersSpeed()
+
+  public void pauseCustomers() {
+    this.isGenerationPaused = true;
+    System.out.println("Os clientes pararam de chegar!");
+    
+  }
+
+  public void resumeCustomers() {
+    this.isGenerationPaused = false;
+    System.out.println("Clientes chegando novamente!");
+  }
   /* ******* */ // Fim Metodos
 } // fim CustomerGenerator

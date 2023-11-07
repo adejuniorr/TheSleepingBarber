@@ -67,7 +67,6 @@ public class BarberShop {
           customers.acquire(); // Consome uma permissao no semaforo de clientes vericando se ha cliente aguardando atendimento (fica bloqueado no semaforo ate que haja)
 
         } else {
-
           mutex.release(); // Incrementa uma permissao no semaforo de exclusao mutua para que outro cliente possa ser atendido (apenas um, conforme o acquire() incial)
           barber.acquire(); // Consome uma permissao no semaforo do barbeiro (o barbeiro esta atendendo um cliente)
           chairs.release(); // Incrementa uma permissao no semaforo de cadeiras (o cliente que estava aguardando foi atendido e liberou uma cadeira)
@@ -127,19 +126,21 @@ public class BarberShop {
     this.isBarberPaused = false;
     this.barberSpeed = 3000;
   }
-  /* ******* */ // Fim Metodos
 
   public void pauseBarber() {
-    System.out.println("Barbeiro Pausado");
+    System.out.println("Barbeiro parou de cortar!");
     isBarberPaused = true;
   }
 
   public void resumeBarber() {
-    System.out.println("Barbeiro Despausado");
+    System.out.println("Barbeiro voltou a cortar!");
     isBarberPaused = false;
   }
 
   public void setBarberSpeed(int intValue) {
     this.barberSpeed = intValue * 1000;
+    System.out.println("O barbeiro está cortando na velocidade de " + intValue + " segundos!");
   }
+
+  /* ******* */ // Fim Metodos
 } // fim BarberShop
