@@ -59,7 +59,7 @@ public class Principal extends Application {
     initialStage.show();
 
     Pane root = new Pane(); // Instancia do painel raiz
-    Scene scene = new Scene(root, 1100, 650); // Instancia da cena principal
+    Scene scene = new Scene(root, 1100, 695); // Instancia da cena principal
     primaryStage.setScene(scene); // Setando a cena principal no palco
     primaryStage.setTitle("Barbeiro Dorminhoco"); // Titulo da janela
     primaryStage.setResizable(false); // Impedindo o redimensionamento da janela
@@ -109,9 +109,11 @@ public class Principal extends Application {
     Button customersPlayPauseBTN = createStyledButton("Pause");
     Label customersVelTitle = new Label("Velocidade");
     customersVelTitle.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+    Button randVelBTN = createStyledButton("Definir Velocidade");
+    randVelBTN.setMaxWidth(170);
     Slider customersSlider = createStyledSlider();
-    customersControlVBox.getChildren().addAll(customersControlTitle, customersPlayPauseBTN, customersVelTitle,
-        customersSlider);
+    customersSlider.setDisable(true);
+    customersControlVBox.getChildren().addAll(customersControlTitle, customersPlayPauseBTN, customersVelTitle, randVelBTN, customersSlider);
 
     lControlPane.getChildren().addAll(mainTitleImg, resetBTN, barberControlVBox, customersControlVBox); // Adicionando
                                                                                                         // os
@@ -123,7 +125,7 @@ public class Principal extends Application {
     Pane rViewPane = new Pane();
     rViewPane.setPrefWidth(800);
     rViewPane.setPrefHeight(650);
-    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: cover;");
+    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: contain;");
     rViewPane.setViewOrder(2);
     mainHBox.getChildren().addAll(lControlPane, rViewPane); // Adicionando os paineis de controle ao HBox principal
     root.getChildren().add(mainHBox); // Adicionando o HBox principal ao painel raiz
@@ -152,6 +154,18 @@ public class Principal extends Application {
 
       customers[0] = new CustomerGenerator(mainBarberShop);
       customers[0].start();
+    });
+
+    randVelBTN.setOnMouseClicked(event -> {
+      if (randVelBTN.getText().equals("Velocidade Aleatória")) {
+        randVelBTN.setText("Definir Velocidade");
+        customers[0].useRandomGen();
+        customersSlider.setDisable(true);
+      } else {
+        randVelBTN.setText("Velocidade Aleatória");
+        customers[0].useDefaultGen();
+        customersSlider.setDisable(false);
+      }
     });
 
     barberPlayPauseBTN.setOnMouseClicked(event -> {
@@ -303,6 +317,7 @@ public class Principal extends Application {
   private Button createStyledButton(String txt) {
     Button styledButton = new Button();
     styledButton.setText(txt);
+    styledButton.setAlignment(Pos.CENTER);
 
     if (txt.equals("Pause")) {
 

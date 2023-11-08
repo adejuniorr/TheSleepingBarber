@@ -17,6 +17,7 @@ public class CustomerGenerator extends Thread {
   public int id; // Variavel de controle para o id de cada cliente
   public int generationSpeed = 3; // Varivael de controle para a velocidade de geracao dos novos clientes
   public boolean isGenerating = true;
+  public boolean randVel = true;
   /* ******************* */ // Fim Atributos
 
   // Construtores:
@@ -48,42 +49,53 @@ public class CustomerGenerator extends Thread {
   public void run() {
     while (true) { // loop infinito (gerando clientes ao longo do tempo de execucao)
       if (this.isGenerating) {
-        System.out.println("if isgenerating");
         if (Thread.currentThread().isInterrupted()) {
           break;
         } // fim if (Thread.currentThread().isInterrupted())
 
         try {
-          System.out.println("generating");
           barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
 
           this.id++; // Incrementa o id para instanciar um novo cliente
 
-          /*
-           * Abaixo temos a geracao de um numero aleatorio para definir um intervalo de
-           * tempo
-           * aleatorio entre uma geracao e outra dentro do loop (impedindo que a geracao
-           * ocorra
-           * ao longo do tempo de execucao)
-           */
-          Random rand = new Random();
-          int randomTime = rand.nextInt(1, generationSpeed+1);
+          if (randVel) {
+            System.out.println("Velocidade Aleatória");
+            /*
+             * Abaixo temos a geracao de um numero aleatorio para definir um intervalo de
+             * tempo
+             * aleatorio entre uma geracao e outra dentro do loop (impedindo que a geracao
+             * ocorra
+             * ao longo do tempo de execucao)
+             */
+            Random rand = new Random();
+            int randomTime = rand.nextInt(1, 5);
 
-          /*
-           * if (this.id == 20) {
-           * Thread.currentThread().interrupt();
-           * }
-           */
+            /*
+             * if (this.id == 20) {
+             * Thread.currentThread().interrupt();
+             * }
+             */
 
-          Thread.sleep(randomTime * 1000); // Por fim, eh setado o tempo de sleep da thread geradora (intervalo entre
-                                           // uma geracao e outra)
+            Thread.sleep(randomTime * 1000); // Por fim, eh setado o tempo de sleep da thread geradora (intervalo entre
+                                             // uma geracao e outra)
+          } else {
+            System.out.println("Velocidade Padrão");
+            Thread.sleep(generationSpeed * 1000);
+          }
+
         } catch (InterruptedException e) { // Caso ocorra uma interrupcao na thread:
           Thread.currentThread().interrupt(); // Interrompe a thread
           break; // Sai do loop
         } // fim try-catch
       } // fim if (!isGenerating)
-      System.out.println(); // Mensagem de console para controle do while enquanto a geracao estiver em Pause
-      /* [!] Esse System.out esta para evitar que, ao pausar a geracao de clientes, o loop while(true) da classe BarberShop siga rodando infinitamente impedindo que, mesmo clicar em Play para gerar os clientes novamente, novos clientes nunca sejam gerados a partir daqui, travando a execucao de todo o programa. */
+      System.out.println(); // Mensagem de console para controle do while enquanto a geracao estiver em
+                            // Pause
+      /*
+       * [!] Esse System.out esta para evitar que, ao pausar a geracao de clientes, o
+       * loop while(true) da classe BarberShop siga rodando infinitamente impedindo
+       * que, mesmo clicar em Play para gerar os clientes novamente, novos clientes
+       * nunca sejam gerados a partir daqui, travando a execucao de todo o programa.
+       */
     } // fim while (true)
   } // fim run()
 
@@ -145,7 +157,7 @@ public class CustomerGenerator extends Thread {
 
   public void setCustomersSpeed(int newSpeed) {
     this.generationSpeed = newSpeed;
-    System.out.println("Clientes chegando a uma velocidade de até " + this.generationSpeed + " segundos");
+    System.out.println("Clientes chegando a uma velocidade de " + this.generationSpeed + " segundos");
   } // fim setCustomersSpeed()
 
   public void pauseCustomers() {
@@ -158,4 +170,14 @@ public class CustomerGenerator extends Thread {
     System.out.println("Clientes chegando novamente!");
   }
   /* ******* */ // Fim Metodos
+
+  public void useRandomGen() {
+    this.randVel = true;
+    System.out.println("Clientes chegando em intervalos aleatorios!");
+  }
+
+  public void useDefaultGen() {
+    this.randVel = false;
+    System.out.println("Clientes chegando em intervalos de " + this.generationSpeed + " segundos!");
+  }
 } // fim CustomerGenerator
