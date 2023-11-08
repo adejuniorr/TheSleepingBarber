@@ -67,13 +67,13 @@ public class Principal extends Application {
     // primaryStage.getIcons().add(new Image("icon.png")); // Icone da janela e do
     // aplicativo
 
-    /*
-     * initialPane.getChildren().get(0).onMouseClickedProperty().set(event -> {
-     * initialStage.close();
-     * primaryStage.show();
-     * });
-     */
-    primaryStage.show();
+  
+    initialPane.getChildren().get(0).onMouseClickedProperty().set(event -> {
+      initialStage.close();
+      primaryStage.show();
+    });
+  
+    //primaryStage.show();
 
     HBox mainHBox = new HBox(); // Instancia do HBox principal
     VBox lControlPane = new VBox();

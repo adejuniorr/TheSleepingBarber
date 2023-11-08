@@ -16,7 +16,7 @@ public class CustomerGenerator extends Thread {
   public BarberShop barberShop; // Instancia da barbearia
   public int id; // Variavel de controle para o id de cada cliente
   public int generationSpeed = 3; // Varivael de controle para a velocidade de geracao dos novos clientes
-  public boolean isGenerationPaused = false;
+  public boolean isGenerating = true;
   /* ******************* */ // Fim Atributos
 
   // Construtores:
@@ -47,12 +47,14 @@ public class CustomerGenerator extends Thread {
   @Override
   public void run() {
     while (true) { // loop infinito (gerando clientes ao longo do tempo de execucao)
-      if (!isGenerationPaused) {
+      if (this.isGenerating) {
+        System.out.println("if isgenerating");
         if (Thread.currentThread().isInterrupted()) {
           break;
         } // fim if (Thread.currentThread().isInterrupted())
 
         try {
+          System.out.println("generating");
           barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
 
           this.id++; // Incrementa o id para instanciar um novo cliente
@@ -79,7 +81,9 @@ public class CustomerGenerator extends Thread {
           Thread.currentThread().interrupt(); // Interrompe a thread
           break; // Sai do loop
         } // fim try-catch
-      }
+      } // fim if (!isGenerating)
+      System.out.println(); // Mensagem de console para controle do while enquanto a geracao estiver em Pause
+      /* [!] Esse System.out esta para evitar que, ao pausar a geracao de clientes, o loop while(true) da classe BarberShop siga rodando infinitamente impedindo que, mesmo clicar em Play para gerar os clientes novamente, novos clientes nunca sejam gerados a partir daqui, travando a execucao de todo o programa. */
     } // fim while (true)
   } // fim run()
 
@@ -145,13 +149,12 @@ public class CustomerGenerator extends Thread {
   } // fim setCustomersSpeed()
 
   public void pauseCustomers() {
-    this.isGenerationPaused = true;
+    this.isGenerating = false;
     System.out.println("Os clientes pararam de chegar!");
-    
   }
 
   public void resumeCustomers() {
-    this.isGenerationPaused = false;
+    this.isGenerating = true;
     System.out.println("Clientes chegando novamente!");
   }
   /* ******* */ // Fim Metodos
