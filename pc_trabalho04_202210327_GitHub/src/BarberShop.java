@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 /* ********************** */
+import javafx.scene.layout.Pane;
 
 public class BarberShop {
   // Atributos da classe:
@@ -28,6 +29,9 @@ public class BarberShop {
   private volatile boolean isBarberPaused = false;
   private volatile int barberSpeed = 3000;
 
+  private Pane barberImage;
+  private Pane waitingCustomersImage;
+
   /* ******************* */ // Fim Atributos
 
   // Construtores:
@@ -39,7 +43,9 @@ public class BarberShop {
    * Retorno: nao retorna valor
    * ***************************************************************
    */
-  public BarberShop() {
+  public BarberShop(Pane barberImage, Pane customersImage) {
+    this.barberImage = barberImage;
+    this.waitingCustomersImage = customersImage;
     customersQueue = new LinkedList<Integer>();
   }
   /* ************ */ // Fim Construtores
@@ -63,6 +69,8 @@ public class BarberShop {
         if (customersQueue.isEmpty()) { // Caso nao haja clientes na fila, aguardando:
 
           System.out.println("O barbeiro está dormindo z Z z Z");
+          barberImage.setStyle("-fx-background-image: url('barberSleeping.png'); -fx-background-size: cover;");
+
           mutex.release(); // Incrementa uma permissao no semaforo de exclusao mutua para que outro cliente possa ser atendido
           customers.acquire(); // Consome uma permissao no semaforo de clientes vericando se ha cliente aguardando atendimento (fica bloqueado no semaforo ate que haja)
 
@@ -72,6 +80,7 @@ public class BarberShop {
           chairs.release(); // Incrementa uma permissao no semaforo de cadeiras (o cliente que estava aguardando foi atendido e liberou uma cadeira)
 
           System.out.println("O barbeiro está cortando o cabelo do cliente " + customersQueue.poll());
+          barberImage.setStyle("-fx-background-image: url('barberWorking.png'); -fx-background-size: cover;");
           System.out.println("Clientes na fila: " + customersQueue.size());
 
           Thread.sleep(barberSpeed); // O barbeiro esta cortando o cabelo do cliente
@@ -97,10 +106,12 @@ public class BarberShop {
    */
   public void startCustomer(int customerId) throws InterruptedException{
     System.out.println("Cliente " + customerId + " entrou na barbearia");
-
+    
     mutex.acquire(); // Consome uma permissao no semaforo de exclusao mutua significando que o cliente esta entrando na barbearia (impedindo que mais de um cliente entre na barbearia ao mesmo tempo, nao ocupando mais espacos do que o disponivel)
     if (customersQueue.size() < CHAIRS) { // Caso haja espaco disponivel na barbearia:
       customersQueue.add(customerId); // Adiciona o cliente na fila de clientes da barbearia  
+
+      this.waitingCustomersImage.setStyle("-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
 
       System.out.println("Clientes na fila: " + customersQueue.size());
       

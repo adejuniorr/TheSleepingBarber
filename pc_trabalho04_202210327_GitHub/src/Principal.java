@@ -79,7 +79,7 @@ public class Principal extends Application {
     VBox lControlPane = new VBox();
 
     lControlPane.setPrefWidth(300);
-    lControlPane.setPrefHeight(650);
+    lControlPane.setPrefHeight(695);
     lControlPane.setStyle("-fx-background-color: #803634; -fx-alignment: center; -fx-padding: 5px; -fx-spacing: 10px;");
     DropShadow lControlPaneShadow = new DropShadow();
     lControlPaneShadow.setRadius(3.0);
@@ -124,14 +124,26 @@ public class Principal extends Application {
 
     Pane rViewPane = new Pane();
     rViewPane.setPrefWidth(800);
-    rViewPane.setPrefHeight(650);
-    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: contain;");
-    rViewPane.setViewOrder(2);
+    rViewPane.setPrefHeight(695);
+    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: cover;");
+    //rViewPane.setViewOrder(2);
     mainHBox.getChildren().addAll(lControlPane, rViewPane); // Adicionando os paineis de controle ao HBox principal
     root.getChildren().add(mainHBox); // Adicionando o HBox principal ao painel raiz
 
     /* Instancia das Classes/Threads */
-    BarberShop mainBarberShop = new BarberShop(); // Instancia da barbearia
+    Pane barberPane = new Pane();
+    barberPane.setPrefWidth(800);
+    barberPane.setPrefHeight(695);
+    barberPane.setStyle("-fx-background-image: url('barberSleeping.png'); -fx-background-size: cover;");
+    rViewPane.getChildren().add(barberPane);
+
+    Pane waitingCustomersPane = new Pane();
+    waitingCustomersPane.setPrefWidth(800);
+    waitingCustomersPane.setPrefHeight(695);
+    waitingCustomersPane.setStyle("-fx-background-image: none; -fx-background-size: cover;");
+    rViewPane.getChildren().add(waitingCustomersPane);
+
+    BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane); // Instancia da barbearia
 
     Barber mainBarber[] = { new Barber(mainBarberShop) }; // Instancia do barbeiro
     mainBarber[0].start(); // Inicia a Thread Barbeiro
