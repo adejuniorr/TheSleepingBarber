@@ -122,7 +122,7 @@ public class Principal extends Application {
 
     Pane rViewPane = new Pane();
     rViewPane.setPrefWidth(800);
-    rViewPane.setPrefHeight(600);
+    rViewPane.setPrefHeight(650);
     rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: cover;");
     rViewPane.setViewOrder(2);
     mainHBox.getChildren().addAll(lControlPane, rViewPane); // Adicionando os paineis de controle ao HBox principal
