@@ -111,7 +111,11 @@ public class BarberShop {
     if (customersQueue.size() < CHAIRS) { // Caso haja espaco disponivel na barbearia:
       customersQueue.add(customerId); // Adiciona o cliente na fila de clientes da barbearia  
 
-      this.waitingCustomersImage.setStyle("-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
+      if (customersQueue.size() == 0) {
+        this.waitingCustomersImage.backgroundProperty().get().getImages().clear();
+      } else {
+        this.waitingCustomersImage.setStyle("-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
+      }
 
       System.out.println("Clientes na fila: " + customersQueue.size());
       
