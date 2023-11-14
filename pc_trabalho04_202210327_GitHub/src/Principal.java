@@ -8,6 +8,7 @@
 *************************************************************** */
 
 /* Bibliotecas importadas */
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.stage.Modality;
@@ -67,14 +68,6 @@ public class Principal extends Application {
     // primaryStage.getIcons().add(new Image("icon.png")); // Icone da janela e do
     // aplicativo
 
-  
-    initialPane.getChildren().get(0).onMouseClickedProperty().set(event -> {
-      initialStage.close();
-      primaryStage.show();
-    });
-  
-    //primaryStage.show();
-
     HBox mainHBox = new HBox(); // Instancia do HBox principal
     VBox lControlPane = new VBox();
 
@@ -113,7 +106,8 @@ public class Principal extends Application {
     randVelBTN.setMaxWidth(170);
     Slider customersSlider = createStyledSlider();
     customersSlider.setDisable(true);
-    customersControlVBox.getChildren().addAll(customersControlTitle, customersPlayPauseBTN, customersVelTitle, randVelBTN, customersSlider);
+    customersControlVBox.getChildren().addAll(customersControlTitle, customersPlayPauseBTN, customersVelTitle,
+        customersSlider, randVelBTN);
 
     lControlPane.getChildren().addAll(mainTitleImg, resetBTN, barberControlVBox, customersControlVBox); // Adicionando
                                                                                                         // os
@@ -125,8 +119,8 @@ public class Principal extends Application {
     Pane rViewPane = new Pane();
     rViewPane.setPrefWidth(800);
     rViewPane.setPrefHeight(695);
-    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: cover;");
-    //rViewPane.setViewOrder(2);
+    rViewPane.setStyle("-fx-background-image: url('barbershop-layer0.png'); -fx-background-size: contain;");
+    // rViewPane.setViewOrder(2);
     mainHBox.getChildren().addAll(lControlPane, rViewPane); // Adicionando os paineis de controle ao HBox principal
     root.getChildren().add(mainHBox); // Adicionando o HBox principal ao painel raiz
 
@@ -146,13 +140,27 @@ public class Principal extends Application {
     BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane); // Instancia da barbearia
 
     Barber mainBarber[] = { new Barber(mainBarberShop) }; // Instancia do barbeiro
-    mainBarber[0].start(); // Inicia a Thread Barbeiro
+    // mainBarber[0].start(); // Inicia a Thread Barbeiro
 
     CustomerGenerator customers[] = { new CustomerGenerator(mainBarberShop) }; // Instancia do gerador de clientes
-    customers[0].start(); // Inicia a Thread Gerador de Clientes
+    // customers[0].start(); // Inicia a Thread Gerador de Clientes
     /* Fim - Instancia das Classes/Threads */
 
     /* Eventos de Click */
+    PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
+    initialPane.getChildren().get(0).onMouseClickedProperty().set(event -> {
+      initialStage.close();
+      primaryStage.show();
+
+      delay.setOnFinished(e -> {
+        mainBarber[0].start();
+        customers[0].start();
+      });
+
+      delay.play();
+    });
+    // primaryStage.show();
+
     resetBTN.setOnMouseClicked(event -> {
       mainBarber[0].interrupt();
       customers[0].interrupt();
@@ -161,11 +169,23 @@ public class Principal extends Application {
 
       mainBarberShop.resetResources();
 
+      barberSlider.setValue(3);
+      customersSlider.setValue(3);
+      customersSlider.setDisable(true);
+      randVelBTN.setText("Velocidade Aleatória");
+      randVelBTN.fire();
+
       mainBarber[0] = new Barber(mainBarberShop);
       mainBarber[0].start();
 
-      customers[0] = new CustomerGenerator(mainBarberShop);
-      customers[0].start();
+      delay.setDuration(javafx.util.Duration.seconds(1));
+      delay.setOnFinished(e -> {
+        customers[0] = new CustomerGenerator(mainBarberShop);
+        customers[0].start();
+
+      });
+      delay.play();
+
     });
 
     randVelBTN.setOnMouseClicked(event -> {
@@ -412,10 +432,13 @@ public class Principal extends Application {
     styledSlider.setShowTickLabels(true); // Mostra os valores do slider
     styledSlider.setShowTickMarks(true); // Mostra as marcas do slider
     styledSlider.setMajorTickUnit(1); // Tamanho das marcas maiores do slider
-    styledSlider.setMinorTickCount(5); // Tamanho de marcas menores do slider
+    styledSlider.setMinorTickCount(0); // Tamanho de marcas menores do slider
     styledSlider.setBlockIncrement(1); // Define o incremento do slider (de 1 em 1)
     styledSlider.setMaxWidth(250); // Largura do slider
     styledSlider.setMaxHeight(0); // Altura do slider
+
+    /* slider.valueProperty().addListener((obs, oldval, newVal) ->
+      slider.setValue(Math.round(newVal.doubleValue()))); */
 
     return styledSlider;
   }

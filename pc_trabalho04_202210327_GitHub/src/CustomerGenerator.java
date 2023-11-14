@@ -47,13 +47,9 @@ public class CustomerGenerator extends Thread {
    **************************************************************/
   @Override
   public void run() {
-    while (true) { // loop infinito (gerando clientes ao longo do tempo de execucao)
-      if (this.isGenerating) {
-        if (Thread.currentThread().isInterrupted()) {
-          break;
-        } // fim if (Thread.currentThread().isInterrupted())
-
-        try {
+    try {
+      while (!Thread.currentThread().isInterrupted()) { // loop infinito (gerando clientes ao longo do tempo de execucao)
+        if (this.isGenerating) {
           barberShop.startCustomer(this.id); // Inicia um novo cliente na barbearia (metodo da classe BarberShop)
 
           this.id++; // Incrementa o id para instanciar um novo cliente
@@ -82,21 +78,23 @@ public class CustomerGenerator extends Thread {
             System.out.println("Velocidade Padrão");
             Thread.sleep(generationSpeed * 1000);
           }
-
-        } catch (InterruptedException e) { // Caso ocorra uma interrupcao na thread:
-          Thread.currentThread().interrupt(); // Interrompe a thread
-          break; // Sai do loop
-        } // fim try-catch
-      } // fim if (!isGenerating)
-      System.out.println(); // Mensagem de console para controle do while enquanto a geracao estiver em
-                            // Pause
-      /*
-       * [!] Esse System.out esta para evitar que, ao pausar a geracao de clientes, o
-       * loop while(true) da classe BarberShop siga rodando infinitamente impedindo
-       * que, mesmo clicar em Play para gerar os clientes novamente, novos clientes
-       * nunca sejam gerados a partir daqui, travando a execucao de todo o programa.
-       */
-    } // fim while (true)
+          if (Thread.currentThread().isInterrupted()) {
+            break;
+          } // fim if (Thread.currentThread().isInterrupted())
+        } // fim if (!isGenerating)
+        // System.out.println(); // Mensagem de console para controle do while enquanto
+        // a geracao estiver em
+        // Pause
+        /*
+         * [!] Esse System.out esta para evitar que, ao pausar a geracao de clientes, o
+         * loop while(true) da classe BarberShop siga rodando infinitamente impedindo
+         * que, mesmo clicar em Play para gerar os clientes novamente, novos clientes
+         * nunca sejam gerados a partir daqui, travando a execucao de todo o programa.
+         */
+      } // fim while (true)
+    } catch (InterruptedException e) {
+      System.out.println("Thread interrompida");
+    }
   } // fim run()
 
   /**
