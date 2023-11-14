@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Path;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -137,13 +138,26 @@ public class Principal extends Application {
     waitingCustomersPane.setStyle("-fx-background-image: none; -fx-background-size: cover;");
     rViewPane.getChildren().add(waitingCustomersPane);
 
-    BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane); // Instancia da barbearia
+    Pane customerAnimationPane = new Pane();
+    customerAnimationPane.setPrefWidth(50);
+    customerAnimationPane.setPrefHeight(50);
+    customerAnimationPane.setTranslateX(30);
+    customerAnimationPane.setTranslateY(700);
+    customerAnimationPane.setStyle("-fx-background-color: #00f;");
+    Pane customerLeavingPane = new Pane();
+    // ...
+    Path customerAnimationPath = new Path();
+    rViewPane.getChildren().addAll(customerAnimationPane, customerAnimationPath);
+
+    BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane, customerAnimationPane, customerAnimationPath); // Instancia da barbearia
 
     Barber mainBarber[] = { new Barber(mainBarberShop) }; // Instancia do barbeiro
     // mainBarber[0].start(); // Inicia a Thread Barbeiro
 
     CustomerGenerator customers[] = { new CustomerGenerator(mainBarberShop) }; // Instancia do gerador de clientes
     // customers[0].start(); // Inicia a Thread Gerador de Clientes
+
+    
     /* Fim - Instancia das Classes/Threads */
 
     /* Eventos de Click */
@@ -172,7 +186,7 @@ public class Principal extends Application {
       barberSlider.setValue(3);
       customersSlider.setValue(3);
       customersSlider.setDisable(true);
-      randVelBTN.setText("Velocidade Aleatória");
+      randVelBTN.setText("Definir Velocidade");
       randVelBTN.fire();
 
       mainBarber[0] = new Barber(mainBarberShop);
@@ -437,8 +451,8 @@ public class Principal extends Application {
     styledSlider.setMaxWidth(250); // Largura do slider
     styledSlider.setMaxHeight(0); // Altura do slider
 
-    /* slider.valueProperty().addListener((obs, oldval, newVal) ->
-      slider.setValue(Math.round(newVal.doubleValue()))); */
+    styledSlider.valueProperty().addListener((obs, oldval, newVal) ->
+      styledSlider.setValue(Math.round(newVal.doubleValue())));
 
     return styledSlider;
   }

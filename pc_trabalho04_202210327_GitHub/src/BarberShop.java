@@ -11,8 +11,15 @@
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
+
+import javafx.animation.Interpolator;
+import javafx.animation.PathTransition;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
 /* ********************** */
+import javafx.scene.shape.Path;
 
 public class BarberShop {
   // Atributos da classe:
@@ -35,6 +42,8 @@ public class BarberShop {
 
   private Pane barberImage;
   private Pane waitingCustomersImage;
+  private Pane customersAnimationPane;
+  private Path customersAnimationPath;
 
   /* ******************* */ // Fim Atributos
 
@@ -47,10 +56,13 @@ public class BarberShop {
    * Retorno: nao retorna valor
    * ***************************************************************
    */
-  public BarberShop(Pane barberImage, Pane customersImage) {
+  public BarberShop(Pane barberImage, Pane customersImage, Pane animationPane, Path animationPath) {
     this.barberImage = barberImage;
     this.waitingCustomersImage = customersImage;
     customersQueue = new LinkedList<Integer>();
+
+    this.customersAnimationPane = animationPane;
+    this.customersAnimationPath = animationPath;
   }
   /* ************ */ // Fim Construtores
 
@@ -92,11 +104,21 @@ public class BarberShop {
                             // aguardando foi atendido e liberou uma cadeira)
 
           System.out.println("O barbeiro está cortando o cabelo do cliente " + customersQueue.poll());
-          this.waitingCustomersImage.setStyle("-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
+          this.waitingCustomersImage.setStyle(
+              "-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
           this.barberImage.setStyle("-fx-background-image: url('barberWorking.png'); -fx-background-size: cover;");
+
           System.out.println("Clientes na fila: " + customersQueue.size());
 
           Thread.sleep(barberSpeed); // O barbeiro esta cortando o cabelo do cliente
+
+          Pane customerLeaving = new Pane();
+          customerLeaving.setTranslateX(this.customersAnimationPane.getTranslateX());
+          customerLeaving.setTranslateY(this.customersAnimationPane.getTranslateY());
+          customerLeaving.setStyle("-fx-background-color: #0f0;");
+          
+          PathTransition customerLeavingAnimation = createCustomerAnimation(this.customersAnimationPane, createCustomerAnimationPath(2));
+          customerLeavingAnimation.play();
 
           if (Thread.currentThread().isInterrupted()) {
             break;
@@ -121,32 +143,52 @@ public class BarberShop {
   public void startCustomer(int customerId) throws InterruptedException {
     System.out.println("Cliente " + customerId + " entrou na barbearia");
 
-    mutex.acquire(); // Consome uma permissao no semaforo de exclusao mutua significando que o
-                     // cliente esta entrando na barbearia (impedindo que mais de um cliente entre na
-                     // barbearia ao mesmo tempo, nao ocupando mais espacos do que o disponivel)
+    if (customersQueue.size() < CHAIRS) {
+      this.customersAnimationPane.setStyle("-fx-background-color: #00f");
+      this.customersAnimationPath = createCustomerAnimationPath(1);
 
-    if (customersQueue.size() < CHAIRS) { // Caso haja espaco disponivel na barbearia:
-      customersQueue.add(customerId); // Adiciona o cliente na fila de clientes da barbearia
-      
-      this.waitingCustomersImage.setStyle("-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
+    } else {
+      this.customersAnimationPane.setStyle("-fx-background-color: #f00");
+      this.customersAnimationPath = createCustomerAnimationPath(3);
+    }
 
-      System.out.println("Clientes na fila: " + customersQueue.size());
+    PathTransition customersAnimation = createCustomerAnimation(this.customersAnimationPane, this.customersAnimationPath);
+    customersAnimation.play();
 
-      customers.release(); // Incrementa uma permissao no semaforo de clientes (cliente aguardando
-                           // atendimento -- desbloqueara o barbeiro caso esteja dormindo)
-                           
-      mutex.release(); // Incrementa uma permissao no semaforo de exclusao mutua para que outro cliente
-                       // possa entrar na barbearia e ser atendido
+    customersAnimation.setOnFinished(event -> {
+      try {
+        mutex.acquire(); // Consome uma permissao no semaforo de exclusao mutua significando que o
+        // cliente esta entrando na barbearia (impedindo que mais de um cliente entre na
+      } catch (InterruptedException exc) {
+        exc.printStackTrace();
+      }
+      // barbearia ao mesmo tempo, nao ocupando mais espacos do que o disponivel)
 
-      barber.release(); // Incrementa uma permissao no semaforo do barbeiro (cliente aguardando
-                        // atendimento -- desbloqueara o barbeiro caso esteja dormindo)
+      if (customersQueue.size() < CHAIRS) { // Caso haja espaco disponivel na barbearia:
+        customersQueue.add(customerId); // Adiciona o cliente na fila de clientes da barbearia
 
-      // System.out.println("Cliente " + customerId + " está cortando o cabelo");
+        this.waitingCustomersImage.setStyle(
+            "-fx-background-image: url('" + customersQueue.size() + "custWaiting.png'); -fx-background-size: cover;");
 
-    } else { // Caso nao haja espaco disponivel na barbearia:
-      System.out.println("Cadeiras ocupadas. Cliente " + customerId + " foi embora");
-      mutex.release(); // up semaphore
-    } // fim if-else
+        System.out.println("Clientes na fila: " + customersQueue.size());
+
+        customers.release(); // Incrementa uma permissao no semaforo de clientes (cliente aguardando
+                             // atendimento -- desbloqueara o barbeiro caso esteja dormindo)
+
+        mutex.release(); // Incrementa uma permissao no semaforo de exclusao mutua para que outro cliente
+                         // possa entrar na barbearia e ser atendido
+
+        barber.release(); // Incrementa uma permissao no semaforo do barbeiro (cliente aguardando
+                          // atendimento -- desbloqueara o barbeiro caso esteja dormindo)
+
+        // System.out.println("Cliente " + customerId + " está cortando o cabelo");
+
+      } else { // Caso nao haja espaco disponivel na barbearia:
+        System.out.println("Cadeiras ocupadas. Cliente " + customerId + " foi embora");
+        mutex.release(); // up semaphore
+      } // fim if-else
+    this.customersAnimationPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+    });
   } // fim startCustomer()
 
   public void resetResources() {
@@ -174,6 +216,40 @@ public class BarberShop {
   public void setBarberSpeed(int intValue) {
     this.barberSpeed = intValue * 1000;
     System.out.println("O barbeiro está cortando na velocidade de " + intValue + " segundos!");
+  }
+
+  public Path createCustomerAnimationPath(int opt) {
+    Path path = new Path();
+    path.setStroke(Color.rgb(0, 255, 0, 1));
+
+    if (opt == 1) {
+      path.getElements().add(new MoveTo(30, 650));
+      path.getElements().add(new LineTo(230, 650));
+
+    } else if (opt == 2) {
+      path.getElements().add(new MoveTo(230, 650));
+      path.getElements().add(new LineTo(30, 650));
+
+    } else {
+      path.getElements().add(new MoveTo(30, 650));
+      path.getElements().add(new LineTo(230, 650));
+      path.getElements().add(new LineTo(30, 650));
+
+    }
+
+    return path;
+  }
+
+  public PathTransition createCustomerAnimation(Pane customersPane, Path path) {
+    PathTransition customersAnimation = new PathTransition();
+    customersAnimation.setPath(path);
+    customersAnimation.setNode(customersPane);
+    customersAnimation.setInterpolator(Interpolator.LINEAR);
+    customersAnimation.setRate(0.25);
+    customersAnimation.setCycleCount(1);
+    customersAnimation.setAutoReverse(false);
+
+    return customersAnimation;
   }
 
   /* ******* */ // Fim Metodos
