@@ -145,11 +145,15 @@ public class Principal extends Application {
     customerAnimationPane.setTranslateY(700);
     customerAnimationPane.setStyle("-fx-background-color: #00f;");
     Pane customerLeavingPane = new Pane();
-    // ...
+    customerLeavingPane.setPrefWidth(50);
+    customerLeavingPane.setPrefHeight(50);
+    customerLeavingPane.setTranslateX(230);
+    customerLeavingPane.setTranslateY(700);
+    customerLeavingPane.setStyle("-fx-background-color: #0f0;");
     Path customerAnimationPath = new Path();
-    rViewPane.getChildren().addAll(customerAnimationPane, customerAnimationPath);
+    rViewPane.getChildren().addAll(customerAnimationPane, customerLeavingPane, customerAnimationPath);
 
-    BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane, customerAnimationPane, customerAnimationPath); // Instancia da barbearia
+    BarberShop mainBarberShop = new BarberShop(barberPane, waitingCustomersPane, customerAnimationPane, customerLeavingPane, customerAnimationPath); // Instancia da barbearia
 
     Barber mainBarber[] = { new Barber(mainBarberShop) }; // Instancia do barbeiro
     // mainBarber[0].start(); // Inicia a Thread Barbeiro

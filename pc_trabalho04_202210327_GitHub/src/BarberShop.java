@@ -43,6 +43,7 @@ public class BarberShop {
   private Pane barberImage;
   private Pane waitingCustomersImage;
   private Pane customersAnimationPane;
+  private Pane customerLeavingPane;
   private Path customersAnimationPath;
 
   /* ******************* */ // Fim Atributos
@@ -56,12 +57,13 @@ public class BarberShop {
    * Retorno: nao retorna valor
    * ***************************************************************
    */
-  public BarberShop(Pane barberImage, Pane customersImage, Pane animationPane, Path animationPath) {
+  public BarberShop(Pane barberImage, Pane customersImage, Pane animationPane, Pane customerLeavingPane, Path animationPath) {
     this.barberImage = barberImage;
     this.waitingCustomersImage = customersImage;
     customersQueue = new LinkedList<Integer>();
 
     this.customersAnimationPane = animationPane;
+    this.customerLeavingPane = customerLeavingPane;
     this.customersAnimationPath = animationPath;
   }
   /* ************ */ // Fim Construtores
@@ -111,13 +113,8 @@ public class BarberShop {
           System.out.println("Clientes na fila: " + customersQueue.size());
 
           Thread.sleep(barberSpeed); // O barbeiro esta cortando o cabelo do cliente
-
-          Pane customerLeaving = new Pane();
-          customerLeaving.setTranslateX(this.customersAnimationPane.getTranslateX());
-          customerLeaving.setTranslateY(this.customersAnimationPane.getTranslateY());
-          customerLeaving.setStyle("-fx-background-color: #0f0;");
           
-          PathTransition customerLeavingAnimation = createCustomerAnimation(this.customersAnimationPane, createCustomerAnimationPath(2));
+          PathTransition customerLeavingAnimation = createCustomerAnimation(this.customerLeavingPane, createCustomerAnimationPath(2));
           customerLeavingAnimation.play();
 
           if (Thread.currentThread().isInterrupted()) {
