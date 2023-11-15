@@ -2,7 +2,7 @@
 * Autor............: Ademir de Jesus Reis Junior
 * Matricula........: 202210327
 * Inicio...........: 03/11/2023
-* Ultima alteracao.: 03/11/2023
+* Ultima alteracao.: 14/11/2023
 * Nome.............: Barber.java
 * Funcao...........: Classe que representa o barbeiro (Thread)
 *************************************************************** */
