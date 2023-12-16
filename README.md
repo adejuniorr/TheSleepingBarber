@@ -1,6 +1,6 @@
 ## The Sleeping Barber | O Barbeiro Dorminhoco
 
-This is a programming project in the Java language that portrays another well-known problem in the study of Concurrent Systems: The Sleeping Barber.
+This is a programming project in the Java language that portrays another well-known problem in the study of Concurrent Systems: **The Sleeping Barber**.
 
 > The problem presented is built on a barbershop with only one barber working on only one barber's chair and five chairs for customers.
 
